@@ -1,5 +1,6 @@
 import uvloop
 import abc
+import logging
 from typing import List, Callable
 from graphene import Schema
 from starlette.applications import Starlette
@@ -8,6 +9,9 @@ from starlette.requests import Request
 from starlette.responses import Response, JSONResponse
 from starlette.routing import Route
 from graphql.execution.executors.asyncio import AsyncioExecutor
+
+
+logger = logging.getLogger(__name__)
 
 
 class IServer(abc.ABC):
@@ -46,6 +50,7 @@ class UVLoopServer(IServer):
         if routes is None:
             routes = []
         uvloop.install()
+        logger.info('uvloop install')
         return Starlette(routes=routes, on_startup=on_startup, on_shutdown=on_shutdown)
 
 
@@ -55,7 +60,7 @@ class HelloServer(UVLoopServer):
     def create_server(cls, on_startup: List[Callable], on_shutdown: List[Callable], routes=None) -> Starlette:
         async def hello(request: Request) -> Response:
             return JSONResponse({'hello': 'world'})
-
+        logger.info('Creating HelloServer')
         return super().create_server(on_startup, on_shutdown, [Route('/', hello)])
 
 
@@ -63,4 +68,5 @@ class GraphQLServer(IGraphQLServer):
     @classmethod
     def create_server(cls, on_startup: List[Callable], on_shutdown: List[Callable], schema: Schema) -> Starlette:
         graphql_route = Route('/', GraphQLApp(schema=schema, executor_class=AsyncioExecutor))
+        logger.info('Creating GraphQLServer')
         return UVLoopServer.create_server(on_startup, on_shutdown, routes=[graphql_route])
