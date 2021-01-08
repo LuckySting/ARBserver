@@ -24,6 +24,6 @@ class RestaurantResolver:
         return restaurant
 
     @classmethod
-    async def resolve_image(cls, parent: RestaurantModel, info: ResolveInfo) -> FileModel:
+    async def resolve_restaurant_image(cls, parent: RestaurantModel, info: ResolveInfo) -> FileModel:
         image = await parent.image.first()
         return image

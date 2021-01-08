@@ -26,5 +26,5 @@ class RestaurantType(ObjectType):
     confirmed = Boolean(required=True)
 
     async def resolve_image(parent: RestaurantModel, info: ResolveInfo) -> FileModel:
-        image = await RestaurantResolver.resolve_image(parent, info)
+        image = await RestaurantResolver.resolve_restaurant_image(parent, info)
         return image
