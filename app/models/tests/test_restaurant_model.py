@@ -1,5 +1,3 @@
-import asyncio
-
 import asynctest
 from tortoise.contrib.test import finalizer, initializer
 from tortoise.fields import ReverseRelation

@@ -7,4 +7,3 @@ class PlaceModel(BaseModel):
         table = 'place'
 
     restaurant = fields.ForeignKeyField(model_name='models.RestaurantModel', related_name='places')
-
