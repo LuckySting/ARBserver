@@ -13,6 +13,6 @@ class DishModel(BaseModel):
                                                                                     related_name='menu')
     name = fields.CharField(max_length=200, description='Name of the dish')
     image: fields.ForeignKeyRelation[FileModel] = fields.ForeignKeyField(model_name='models.FileModel', related_name='dish')
-    price = fields.IntField(description='Price of the dish')
+    price = fields.FloatField(description='Price of the dish')
     sale = fields.BooleanField(default=False, description='Is on sale')
-    sale_price = fields.IntField(default=0, description='Sale price of the dish')
+    sale_price = fields.FloatField(default=0, description='Sale price of the dish')
