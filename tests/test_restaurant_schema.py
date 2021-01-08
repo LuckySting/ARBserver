@@ -85,6 +85,8 @@ class RestaurantSchemaTestCase(asynctest.TestCase):
                     }}
                     description
                     confirmed
+                    createdAt
+                    updatedAt
                 }}
             }}""")
         self.assertIsNotNone(result['data'])
@@ -95,3 +97,5 @@ class RestaurantSchemaTestCase(asynctest.TestCase):
         self.assertEqual(restaurant['image']['path'], 'ttt')
         self.assertEqual(restaurant['description'], '')
         self.assertEqual(restaurant['confirmed'], False)
+        self.assertIsNotNone(restaurant['createdAt'])
+        self.assertIsNotNone(restaurant['updatedAt'])

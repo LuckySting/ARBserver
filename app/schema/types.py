@@ -1,4 +1,4 @@
-from graphene import ObjectType, ID, String, Boolean, Int, InputObjectType, Field, ResolveInfo
+from graphene import ObjectType, ID, String, Boolean, Int, InputObjectType, Field, ResolveInfo, DateTime
 
 from app.models import FileModel, RestaurantModel
 from app.resolvers.RestaurantResolver import RestaurantResolver
@@ -24,6 +24,8 @@ class RestaurantType(ObjectType):
     image = Field(FileType)
     description = String(required=True)
     confirmed = Boolean(required=True)
+    created_at = DateTime(required=True)
+    updated_at = DateTime(required=True)
 
     async def resolve_image(parent: RestaurantModel, info: ResolveInfo) -> FileModel:
         image = await RestaurantResolver.resolve_restaurant_image(parent, info)
