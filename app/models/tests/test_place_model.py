@@ -1,9 +1,7 @@
-from typing import Awaitable
-
 import asynctest
+from typing import Awaitable
 from tortoise.contrib.test import finalizer, initializer
 from tortoise.fields import ReverseRelation
-
 from app.models import *
 from app.models.BaseModel import BaseModel
 

@@ -1,7 +1,6 @@
 from app.models import RestaurantModel
 from app.models.BaseModel import BaseModel
 from tortoise import fields, Model
-
 from app.models.FileModel import FileModel
 
 
