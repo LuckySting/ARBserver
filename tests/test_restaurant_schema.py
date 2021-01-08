@@ -3,7 +3,7 @@ from tortoise.contrib.test import initializer, finalizer
 from graphene import Schema
 from graphene.test import Client
 
-from app.models import FileModel
+from app.models import FileModel, DishModel
 from app.schema import DefaultSchema
 from graphql.execution.executors.asyncio import AsyncioExecutor
 from app.models.RestaurantModel import RestaurantModel
@@ -99,3 +99,42 @@ class RestaurantSchemaTestCase(asynctest.TestCase):
         self.assertEqual(restaurant['confirmed'], False)
         self.assertIsNotNone(restaurant['createdAt'])
         self.assertIsNotNone(restaurant['updatedAt'])
+
+    async def test_can_get_restaurant_menu(self):
+        image = await FileModel.create(path='ttt')
+        rest = RestaurantModel(name='test2', image=image)
+        await rest.save()
+        dish1 = DishModel(name='test', image=image, restaurant=rest, price=123)
+        await dish1.save()
+        result = await self.client.execute(f"""
+                    query {{
+                        restaurant(id: "{rest.id}") {{
+                            id
+                            name
+                            menu {{
+                                id
+                                name
+                                image {{
+                                    path
+                                }}
+                                price
+                                restaurant {{
+                                    id
+                                    name
+                                }}
+                            }}
+                        }}
+                    }}""")
+        self.assertIsNotNone(result['data'])
+        self.assertIsNotNone(result['data']['restaurant'])
+        menu = result['data']['restaurant']['menu']
+        self.assertEqual(len(menu), 1)
+        dish = menu[0]
+        self.assertEqual(dish['id'], '1')
+        self.assertEqual(dish['name'], 'test')
+        self.assertEqual(dish['image']['path'], 'ttt')
+        self.assertEqual(dish['price'], 123)
+        self.assertEqual(result['data']['restaurant']['menu'][0]['restaurant']['id'],
+                         result['data']['restaurant']['id'])
+        self.assertEqual(result['data']['restaurant']['menu'][0]['restaurant']['name'],
+                         result['data']['restaurant']['name'])

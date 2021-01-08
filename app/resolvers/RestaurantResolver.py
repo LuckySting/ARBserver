@@ -1,22 +1,16 @@
 from typing import List
 
 from graphene import ResolveInfo
-from app.models import RestaurantModel, FileModel
+from app.models import RestaurantModel, FileModel, DishModel
+from .OrderByPaginationResolver import OrderByPaginationResolver
 
 
-class RestaurantResolver:
+class RestaurantResolver(OrderByPaginationResolver):
     @classmethod
     async def resolve_restaurants(cls, info: ResolveInfo, order_by: 'OrderByType',
                                   pagination: 'PaginationType') -> List[RestaurantModel]:
         restaurants = RestaurantModel.all()
-        if order_by is not None:
-            if order_by.desk:
-                restaurants = restaurants.order_by(f'-{order_by.field}')
-            else:
-                restaurants = restaurants.order_by(order_by.field)
-        if pagination is not None:
-            restaurants = restaurants.offset(pagination.limit * (pagination.page - 1)).limit(pagination.limit)
-        return await restaurants
+        return await cls.order_by_pagination(restaurants, order_by, pagination)
 
     @classmethod
     async def resolve_restaurant(cls, info: ResolveInfo, id: str) -> RestaurantModel:
@@ -25,5 +19,21 @@ class RestaurantResolver:
 
     @classmethod
     async def resolve_restaurant_image(cls, parent: RestaurantModel, info: ResolveInfo) -> FileModel:
+        image = await parent.image.first()
+        return image
+
+    @classmethod
+    async def resolve_dish_restaurant(cls, parent: DishModel, info: ResolveInfo) -> RestaurantModel:
+        restaurant = await parent.restaurant.first()
+        return restaurant
+
+    @classmethod
+    async def resolve_restaurant_menu(cls, parent: RestaurantModel, info: ResolveInfo, order_by: 'OrderByType',
+                                      pagination: 'PaginationType') -> List[DishModel]:
+        menu = await cls.order_by_pagination(parent.menu.all(), order_by, pagination)
+        return menu
+
+    @classmethod
+    async def resolve_dish_image(cls, parent: RestaurantModel, info: ResolveInfo) -> FileModel:
         image = await parent.image.first()
         return image
