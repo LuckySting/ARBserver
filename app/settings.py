@@ -2,6 +2,16 @@ import abc
 import logging
 from typing import Dict, Union
 
+TORTOISE_ORM_CONFIG = {
+    "connections": {"default": "postgres://arb_server:1111@localhost:5432/arb_server_db"},
+    "apps": {
+        "models": {
+            "models": ["app.models", "aerich.models"],
+            "default_connection": "default",
+        },
+    },
+}
+
 
 class ISettings(abc.ABC):
 
@@ -37,15 +47,7 @@ class Settings(ISettings):
         )
 
     def get_tortoise_orm_config(self) -> Dict[str, Dict[str, Union[str, dict]]]:
-        return {
-            "connections": {"default": "postgres://arb_server:1111@localhost:5432/arb_server_db"},
-            "apps": {
-                "models": {
-                    "models": ["app.models", "aerich.models"],
-                    "default_connection": "default",
-                },
-            },
-        }
+        return TORTOISE_ORM_CONFIG
 
 
 current_settings = Settings()
