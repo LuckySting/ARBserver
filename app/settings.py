@@ -3,7 +3,7 @@ import logging
 from typing import Dict, Union
 
 TORTOISE_ORM_CONFIG = {
-    "connections": {"default": "postgres://arb_server:1111@localhost:5432/arb_server_db"},
+    "connections": {"default": "postgres://arb_server:Lu5wahcou2@postgres:5432/arb_server_db"},
     "apps": {
         "models": {
             "models": ["app.models", "aerich.models"],
