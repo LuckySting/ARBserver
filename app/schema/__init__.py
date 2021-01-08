@@ -2,6 +2,8 @@ import abc
 
 import graphene
 
+from app.schema.queries import DefaultQuery
+
 
 class ISchema(abc.ABC):
     @classmethod
@@ -29,4 +31,4 @@ class HelloSchema(ISchema):
 class DefaultSchema(ISchema):
     @classmethod
     def get_schema(cls) -> graphene.Schema:
-        return graphene.Schema()
+        return graphene.Schema(query=DefaultQuery)
