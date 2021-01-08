@@ -1,0 +1,16 @@
+version: '3'
+services:
+  arbserver:
+    build: .
+    container_name: arbserver
+    logging:
+      driver: loki
+      options:
+        loki-url: 'http://admin:Eil1xoh9@localhost:3100/loki/api/v1/push'
+        loki-retries: '2'
+        loki-batch-size: '400'
+        mode: 'non-blocking'
+networks:
+  default:
+    external:
+      name: intranet
