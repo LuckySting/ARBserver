@@ -1,14 +1,13 @@
 from typing import List
 
 from graphene import ResolveInfo
-from app.models import RestaurantModel
-from app.schema.types import OrderByType, PaginationType
+from app.models import RestaurantModel, FileModel
 
 
 class RestaurantResolver:
     @classmethod
-    async def resolve_restaurants(cls, info: ResolveInfo, order_by: OrderByType,
-                                  pagination: PaginationType) -> List[RestaurantModel]:
+    async def resolve_restaurants(cls, info: ResolveInfo, order_by: 'OrderByType',
+                                  pagination: 'PaginationType') -> List[RestaurantModel]:
         restaurants = RestaurantModel.all()
         if order_by is not None:
             if order_by.desk:
@@ -23,3 +22,8 @@ class RestaurantResolver:
     async def resolve_restaurant(cls, info: ResolveInfo, id: str) -> RestaurantModel:
         restaurant = await RestaurantModel.get_or_none(id=int(id))
         return restaurant
+
+    @classmethod
+    async def resolve_image(cls, parent: RestaurantModel, info: ResolveInfo) -> FileModel:
+        image = await parent.image.first()
+        return image

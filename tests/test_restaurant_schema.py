@@ -79,9 +79,19 @@ class RestaurantSchemaTestCase(asynctest.TestCase):
             query {{
                 restaurant(id: "{rest.id}") {{
                     id
-                    
+                    name
+                    image {{
+                        path
+                    }}
+                    description
+                    confirmed
                 }}
             }}""")
         self.assertIsNotNone(result['data'])
         self.assertIsNotNone(result['data']['restaurant'])
-        self.assertEqual(result['data']['restaurant']['id'], str(rest.id))
+        restaurant = result['data']['restaurant']
+        self.assertEqual(restaurant['id'], str(rest.id))
+        self.assertEqual(restaurant['name'], 'test2')
+        self.assertEqual(restaurant['image']['path'], 'ttt')
+        self.assertEqual(restaurant['description'], '')
+        self.assertEqual(restaurant['confirmed'], False)
