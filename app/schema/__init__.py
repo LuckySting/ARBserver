@@ -24,3 +24,9 @@ class HelloSchema(ISchema):
                 return 'Hello world'
 
         return graphene.Schema(query=Query)
+
+
+class DefaultSchema(ISchema):
+    @classmethod
+    def get_schema(cls) -> graphene.Schema:
+        return graphene.Schema()
