@@ -72,7 +72,7 @@ class PlaceType(ObjectType):
     address = String(required=True)
     longitude = Float(required=True)
     latitude = Float(required=True)
-    # gallery: List(FileType) TODO
+    gallery: List(FileType)
     work_time = String(required=True)
     preorder = Boolean(required=True)
     restaurant = Field(RestaurantType, required=True)
@@ -86,6 +86,11 @@ class PlaceType(ObjectType):
                              pagination: PaginationType = None) -> typing.List[TableModel]:
         tables = await RestaurantResolver.resolve_place_tables(parent, info, order_by, pagination)
         return tables
+
+    async def resolve_gallery(parent: PlaceModel, info: ResolveInfo, order_by: OrderByType = None,
+                              pagination: PaginationType = None) -> typing.List[FileModel]:
+        gallery = await RestaurantResolver.resolve_place_gallery(parent, info, order_by, pagination)
+        return gallery
 
 
 class TableType(ObjectType):

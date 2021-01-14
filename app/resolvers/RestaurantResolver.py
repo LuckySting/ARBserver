@@ -59,3 +59,9 @@ class RestaurantResolver(OrderByPaginationResolver):
                                    pagination: 'PaginationType') -> List[TableModel]:
         tables = await cls.order_by_pagination(parent.tables.all(), order_by, pagination)
         return tables
+
+    @classmethod
+    async def resolve_place_gallery(cls, parent: PlaceModel, info: ResolveInfo, order_by: 'OrderByType',
+                                    pagination: 'PaginationType') -> List[FileModel]:
+        gallery = await cls.order_by_pagination(parent.gallery.all(), order_by, pagination)
+        return gallery
