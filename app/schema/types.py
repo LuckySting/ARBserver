@@ -1,7 +1,7 @@
 import typing
 from graphene import ObjectType, ID, String, Boolean, Int, InputObjectType, Field, ResolveInfo, DateTime, Float, List
 
-from app.models import FileModel, RestaurantModel, DishModel
+from app.models import FileModel, RestaurantModel, DishModel, PlaceModel
 from app.resolvers.RestaurantResolver import RestaurantResolver
 
 
@@ -28,6 +28,7 @@ class RestaurantType(ObjectType):
     created_at = DateTime(required=True)
     updated_at = DateTime(required=True)
     menu = List('app.schema.types.DishType')
+    places = List('app.schema.types.PlaceType')
 
     async def resolve_image(parent: RestaurantModel, info: ResolveInfo) -> FileModel:
         image = await RestaurantResolver.resolve_restaurant_image(parent, info)
@@ -36,6 +37,11 @@ class RestaurantType(ObjectType):
     async def resolve_menu(parent: RestaurantModel, info: ResolveInfo, order_by: OrderByType = None,
                            pagination: PaginationType = None) -> typing.List[DishModel]:
         menu = await RestaurantResolver.resolve_restaurant_menu(parent, info, order_by, pagination)
+        return menu
+
+    async def resolve_places(parent: RestaurantModel, info: ResolveInfo, order_by: OrderByType = None,
+                             pagination: PaginationType = None) -> typing.List[PlaceModel]:
+        menu = await RestaurantResolver.resolve_restaurant_places(parent, info, order_by, pagination)
         return menu
 
 
@@ -57,3 +63,20 @@ class DishType(ObjectType):
     async def resolve_image(parent: DishModel, info: ResolveInfo) -> FileModel:
         image = await RestaurantResolver.resolve_dish_image(parent, info)
         return image
+
+
+class PlaceType(ObjectType):
+    id = ID(required=True)
+    created_at = DateTime(required=True)
+    updated_at = DateTime(required=True)
+    address = String(required=True)
+    longitude = Float(required=True)
+    latitude = Float(required=True)
+    # gallery: List(FileType)
+    work_time = String(required=True)
+    preorder = Boolean(required=True)
+    restaurant = Field(RestaurantType, required=True)
+
+    async def resolve_restaurant(parent: PlaceModel, info: ResolveInfo) -> RestaurantModel:
+        restaurant = await RestaurantResolver.resolve_place_restaurant(parent, info)
+        return restaurant

@@ -3,7 +3,7 @@ from tortoise.contrib.test import initializer, finalizer
 from graphene import Schema
 from graphene.test import Client
 
-from app.models import FileModel, DishModel
+from app.models import FileModel, DishModel, PlaceModel
 from app.schema import DefaultSchema
 from graphql.execution.executors.asyncio import AsyncioExecutor
 from app.models.RestaurantModel import RestaurantModel
@@ -107,24 +107,24 @@ class RestaurantSchemaTestCase(asynctest.TestCase):
         dish1 = DishModel(name='test', image=image, restaurant=rest, price=123)
         await dish1.save()
         result = await self.client.execute(f"""
-                    query {{
-                        restaurant(id: "{rest.id}") {{
+            query {{
+                restaurant(id: "{rest.id}") {{
+                    id
+                    name
+                    menu {{
+                        id
+                        name
+                        image {{
+                            path
+                        }}
+                        price
+                        restaurant {{
                             id
                             name
-                            menu {{
-                                id
-                                name
-                                image {{
-                                    path
-                                }}
-                                price
-                                restaurant {{
-                                    id
-                                    name
-                                }}
-                            }}
                         }}
-                    }}""")
+                    }}
+                }}
+            }}""")
         self.assertIsNotNone(result['data'])
         self.assertIsNotNone(result['data']['restaurant'])
         menu = result['data']['restaurant']['menu']
@@ -138,3 +138,27 @@ class RestaurantSchemaTestCase(asynctest.TestCase):
                          result['data']['restaurant']['id'])
         self.assertEqual(result['data']['restaurant']['menu'][0]['restaurant']['name'],
                          result['data']['restaurant']['name'])
+
+    async def test_can_get_restaurant_places(self):
+        image = await FileModel.create(path='ttt')
+        rest = RestaurantModel(name='test2', image=image)
+        await rest.save()
+        await PlaceModel.create(address='dd', longitude=0, latitude=0, work_time='', restaurant=rest)
+        await PlaceModel.create(address='dd2', longitude=0, latitude=0, work_time='', restaurant=rest)
+        result = await self.client.execute(f"""
+            query {{
+                restaurant(id: "{rest.id}") {{
+                    id
+                    places {{
+                        id
+                        restaurant {{
+                            id
+                        }}
+                    }}
+                }}
+            }}""")
+        self.assertIsNotNone(result['data'])
+        self.assertIsNotNone(result['data']['restaurant'])
+        places = result['data']['restaurant']['places']
+        self.assertEqual(len(places), 2)
+        self.assertEqual(places[0]['restaurant']['id'], result['data']['restaurant']['id'])
