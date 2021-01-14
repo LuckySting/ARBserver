@@ -3,8 +3,6 @@ services:
   arbserver:
     build: .
     container_name: arbserver
-    volumes:
-    - /opt/docker_arbserver:/app
     logging:
       driver: loki
       options:
