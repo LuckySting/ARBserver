@@ -3,7 +3,7 @@ from tortoise.contrib.test import initializer, finalizer
 from graphene import Schema
 from graphene.test import Client
 
-from app.models import FileModel, DishModel, PlaceModel
+from app.models import FileModel, DishModel, PlaceModel, TableModel
 from app.schema import DefaultSchema
 from graphql.execution.executors.asyncio import AsyncioExecutor
 from app.models.RestaurantModel import RestaurantModel
@@ -162,3 +162,32 @@ class RestaurantSchemaTestCase(asynctest.TestCase):
         places = result['data']['restaurant']['places']
         self.assertEqual(len(places), 2)
         self.assertEqual(places[0]['restaurant']['id'], result['data']['restaurant']['id'])
+
+    async def test_can_get_restaurant_place_tables(self):
+        image = await FileModel.create(path='ttt')
+        rest = RestaurantModel(name='test2', image=image)
+        await rest.save()
+        place = await PlaceModel.create(address='dd', longitude=0, latitude=0, work_time='', restaurant=rest)
+        await TableModel.create(name='sdf', capacity=4, image=image, place=place)
+        result = await self.client.execute(f"""
+            query {{
+                restaurant(id: "{rest.id}") {{
+                    id
+                    places {{
+                        id
+                        tables {{
+                            id
+                            name
+                            capacity
+                            place {{
+                                id
+                            }}
+                        }}
+                    }}
+                }}
+            }}""")
+        self.assertIsNotNone(result['data'])
+        self.assertIsNotNone(result['data']['restaurant'])
+        places = result['data']['restaurant']['places']
+        tables = places[0]['tables']
+        self.assertEqual(tables[0], {'id': '1', 'name': 'sdf', 'capacity': 4, 'place': {'id': '1'}})

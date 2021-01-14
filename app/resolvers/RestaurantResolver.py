@@ -1,7 +1,7 @@
 from typing import List
 
 from graphene import ResolveInfo
-from app.models import RestaurantModel, FileModel, DishModel, PlaceModel
+from app.models import RestaurantModel, FileModel, DishModel, PlaceModel, TableModel
 from .OrderByPaginationResolver import OrderByPaginationResolver
 
 
@@ -48,3 +48,14 @@ class RestaurantResolver(OrderByPaginationResolver):
                                         pagination: 'PaginationType') -> List[PlaceModel]:
         places = await cls.order_by_pagination(parent.places.all(), order_by, pagination)
         return places
+
+    @classmethod
+    async def resolve_table_place(cls, parent: TableModel, info: ResolveInfo) -> PlaceModel:
+        place = await parent.place.first()
+        return place
+
+    @classmethod
+    async def resolve_place_tables(cls, parent: PlaceModel, info: ResolveInfo, order_by: 'OrderByType',
+                                   pagination: 'PaginationType') -> List[TableModel]:
+        tables = await cls.order_by_pagination(parent.tables.all(), order_by, pagination)
+        return tables
