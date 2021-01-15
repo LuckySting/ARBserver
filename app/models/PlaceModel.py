@@ -18,6 +18,7 @@ class PlaceModel(BaseModel):
     work_time = fields.CharField(max_length=100, description='Place work time')
     preorder = fields.BooleanField(default=False, description='Preorder is allowed')
     tables: fields.ReverseRelation["TableModel"]
+    rating = fields.IntField(description='Rating of the place', default=25)
 
 
 class PlaceGallery(Model):

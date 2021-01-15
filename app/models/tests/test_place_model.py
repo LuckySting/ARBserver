@@ -34,3 +34,4 @@ class PlaceModelTestCase(asynctest.TestCase):
         self.assertEqual(place.preorder, False)
         self.assertIsInstance(place.tables, ReverseRelation)
         self.assertIsInstance(place.restaurant, Awaitable)
+        self.assertEqual(place.rating, 25)
