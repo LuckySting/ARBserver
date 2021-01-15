@@ -15,7 +15,8 @@ class PlaceModel(BaseModel):
     longitude = fields.FloatField(description='Longitude of the place')
     latitude = fields.FloatField(description='Latitude of the place')
     gallery: fields.ReverseRelation["PlaceGallery"]
-    work_time = fields.CharField(max_length=100, description='Place work time')
+    work_time_start = fields.CharField(default='', max_length=5, description='Place work time start')
+    work_time_stop = fields.CharField(default='', max_length=5, description='Place work time start')
     preorder = fields.BooleanField(default=False, description='Preorder is allowed')
     tables: fields.ReverseRelation["TableModel"]
     rating = fields.IntField(description='Rating of the place', default=25)
