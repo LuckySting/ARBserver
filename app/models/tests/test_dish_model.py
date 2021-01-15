@@ -30,4 +30,4 @@ class DishModelTestCase(asynctest.TestCase):
         self.assertIsNone(dish.price)
         self.assertEqual(dish.sale_price, 0)
         self.assertFalse(dish.sale)
-        self.assertIsNone(dish.description)
+        self.assertEqual(dish.description, '')
