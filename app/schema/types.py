@@ -1,4 +1,6 @@
 import typing
+from datetime import datetime
+
 from graphene import ObjectType, ID, String, Boolean, Int, InputObjectType, Field, ResolveInfo, DateTime, Float, List
 
 from app.models import FileModel, RestaurantModel, DishModel, PlaceModel, TableModel
@@ -27,6 +29,7 @@ class RestaurantType(ObjectType):
     confirmed = Boolean(required=True)
     created_at = DateTime(required=True)
     updated_at = DateTime(required=True)
+    last_place_created_at = DateTime(required=True)
     menu = List('app.schema.types.DishType')
     places = List('app.schema.types.PlaceType')
 
@@ -43,6 +46,10 @@ class RestaurantType(ObjectType):
                              pagination: PaginationType = None) -> typing.List[PlaceModel]:
         menu = await RestaurantResolver.resolve_restaurant_places(parent, info, order_by, pagination)
         return menu
+
+    async def resolve_last_place_created_at(parent: RestaurantModel, info: ResolveInfo) -> datetime:
+        dt = await RestaurantResolver.resolve_restaurant_last_place_created_at(parent, info)
+        return dt
 
 
 class DishType(ObjectType):

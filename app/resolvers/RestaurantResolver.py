@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 
 from graphene import ResolveInfo
@@ -65,3 +66,8 @@ class RestaurantResolver(OrderByPaginationResolver):
                                     pagination: 'PaginationType') -> List[FileModel]:
         gallery = await cls.order_by_pagination(parent.gallery.all(), order_by, pagination)
         return gallery
+
+    @classmethod
+    async def resolve_restaurant_last_place_created_at(cls, parent: RestaurantModel, info: ResolveInfo) -> datetime:
+        last_created_place: PlaceModel = await parent.places.order_by('created_at').first()
+        return last_created_place.created_at
