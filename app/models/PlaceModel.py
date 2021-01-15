@@ -20,6 +20,8 @@ class PlaceModel(BaseModel):
     preorder = fields.BooleanField(default=False, description='Preorder is allowed')
     tables: fields.ReverseRelation["TableModel"]
     rating = fields.IntField(description='Rating of the place', default=25)
+    min_intervals_for_book = fields.IntField(description='Min number of intervals of 30 min for booking', default=1)
+    max_intervals_for_book = fields.IntField(description='Max number of intervals of 30 min for booking', default=10)
 
 
 class PlaceGallery(Model):
