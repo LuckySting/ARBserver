@@ -72,7 +72,7 @@ class PlaceType(ObjectType):
     address = String(required=True)
     longitude = Float(required=True)
     latitude = Float(required=True)
-    gallery: List(FileType)
+    gallery = List(FileType)
     work_time = String(required=True)
     preorder = Boolean(required=True)
     restaurant = Field(RestaurantType, required=True)

@@ -30,16 +30,18 @@ CREATE TABLE IF NOT EXISTS "dish" (
     "created_at" TIMESTAMPTZ NOT NULL  DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL  DEFAULT CURRENT_TIMESTAMP,
     "name" VARCHAR(200) NOT NULL,
+    "description" TEXT NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
     "sale" BOOL NOT NULL  DEFAULT False,
     "sale_price" DOUBLE PRECISION NOT NULL  DEFAULT 0,
-    "restaurant_id" INT NOT NULL REFERENCES "restaurant" ("id") ON DELETE CASCADE,
-    "image_id" INT NOT NULL REFERENCES "file" ("id") ON DELETE CASCADE
+    "image_id" INT NOT NULL REFERENCES "file" ("id") ON DELETE CASCADE,
+    "restaurant_id" INT NOT NULL REFERENCES "restaurant" ("id") ON DELETE CASCADE
 );
 COMMENT ON COLUMN "dish"."id" IS 'Identifier field';
 COMMENT ON COLUMN "dish"."created_at" IS 'Datetime of creation of object';
 COMMENT ON COLUMN "dish"."updated_at" IS 'Datetime of last update of object';
 COMMENT ON COLUMN "dish"."name" IS 'Name of the dish';
+COMMENT ON COLUMN "dish"."description" IS 'Description of the dish';
 COMMENT ON COLUMN "dish"."price" IS 'Price of the dish';
 COMMENT ON COLUMN "dish"."sale" IS 'Is on sale';
 COMMENT ON COLUMN "dish"."sale_price" IS 'Sale price of the dish';
@@ -51,8 +53,12 @@ CREATE TABLE IF NOT EXISTS "place" (
     "address" VARCHAR(300) NOT NULL,
     "longitude" DOUBLE PRECISION NOT NULL,
     "latitude" DOUBLE PRECISION NOT NULL,
-    "work_time" VARCHAR(100) NOT NULL,
+    "work_time_start" VARCHAR(5) NOT NULL  DEFAULT '',
+    "work_time_stop" VARCHAR(5) NOT NULL  DEFAULT '',
     "preorder" BOOL NOT NULL  DEFAULT False,
+    "rating" INT NOT NULL  DEFAULT 25,
+    "min_intervals_for_book" INT NOT NULL  DEFAULT 1,
+    "max_intervals_for_book" INT NOT NULL  DEFAULT 10,
     "restaurant_id" INT NOT NULL REFERENCES "restaurant" ("id") ON DELETE CASCADE
 );
 COMMENT ON COLUMN "place"."id" IS 'Identifier field';
@@ -61,13 +67,17 @@ COMMENT ON COLUMN "place"."updated_at" IS 'Datetime of last update of object';
 COMMENT ON COLUMN "place"."address" IS 'Address of the place';
 COMMENT ON COLUMN "place"."longitude" IS 'Longitude of the place';
 COMMENT ON COLUMN "place"."latitude" IS 'Latitude of the place';
-COMMENT ON COLUMN "place"."work_time" IS 'Place work time';
+COMMENT ON COLUMN "place"."work_time_start" IS 'Place work time start';
+COMMENT ON COLUMN "place"."work_time_stop" IS 'Place work time start';
 COMMENT ON COLUMN "place"."preorder" IS 'Preorder is allowed';
+COMMENT ON COLUMN "place"."rating" IS 'Rating of the place';
+COMMENT ON COLUMN "place"."min_intervals_for_book" IS 'Min number of intervals of 30 min for booking';
+COMMENT ON COLUMN "place"."max_intervals_for_book" IS 'Max number of intervals of 30 min for booking';
 COMMENT ON TABLE "place" IS 'Represents place';
 CREATE TABLE IF NOT EXISTS "placegallery" (
     "id" SERIAL NOT NULL PRIMARY KEY,
-    "place_id" INT NOT NULL REFERENCES "place" ("id") ON DELETE CASCADE,
-    "file_id" INT NOT NULL REFERENCES "file" ("id") ON DELETE CASCADE
+    "file_id" INT NOT NULL REFERENCES "file" ("id") ON DELETE CASCADE,
+    "place_id" INT NOT NULL REFERENCES "place" ("id") ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS "table" (
     "id" SERIAL NOT NULL PRIMARY KEY,
@@ -78,8 +88,8 @@ CREATE TABLE IF NOT EXISTS "table" (
     "capacity" INT NOT NULL,
     "smoking" BOOL NOT NULL  DEFAULT False,
     "description" VARCHAR(1000) NOT NULL  DEFAULT '',
-    "place_id" INT NOT NULL REFERENCES "place" ("id") ON DELETE CASCADE,
-    "image_id" INT NOT NULL REFERENCES "file" ("id") ON DELETE CASCADE
+    "image_id" INT NOT NULL REFERENCES "file" ("id") ON DELETE CASCADE,
+    "place_id" INT NOT NULL REFERENCES "place" ("id") ON DELETE CASCADE
 );
 COMMENT ON COLUMN "table"."id" IS 'Identifier field';
 COMMENT ON COLUMN "table"."created_at" IS 'Datetime of creation of object';
