@@ -12,6 +12,7 @@ class DishModel(BaseModel):
     restaurant: fields.ForeignKeyRelation[RestaurantModel] = fields.ForeignKeyField(model_name='models.RestaurantModel',
                                                                                     related_name='menu')
     name = fields.CharField(max_length=200, description='Name of the dish')
+    description = fields.TextField(description='Description of the dish')
     image: fields.ForeignKeyRelation[FileModel] = fields.ForeignKeyField(model_name='models.FileModel', related_name='dish')
     price = fields.FloatField(description='Price of the dish')
     sale = fields.BooleanField(default=False, description='Is on sale')
