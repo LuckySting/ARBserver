@@ -1,3 +1,5 @@
+import asyncio
+
 import asynctest
 from tortoise.contrib.test import initializer, finalizer
 from graphene import Schema
@@ -51,6 +53,33 @@ class RestaurantSchemaTestCase(asynctest.TestCase):
             }""")
         self.assertListEqual(result['data']['restaurants'], [{'id': '1'}, {'id': '2'}])
         self.assertListEqual(result2['data']['restaurants'], [{'id': '2'}, {'id': '1'}])
+
+    async def test_can_order_restaurants_using_camelcase_and_snake_case(self):
+        image = await FileModel.create(path='t')
+        await RestaurantModel.create(name='test', image=image)
+        await asyncio.sleep(0.2)
+        await RestaurantModel.create(name='test2', image=image)
+        result = await self.client.execute("""
+            query {
+                restaurants(orderBy: {field: "createdAt"}) {
+                    id
+                }
+            }""")
+        result2 = await self.client.execute("""
+            query {
+                restaurants(orderBy: {field: "createdAt", desk: true}) {
+                    id
+                }
+            }""")
+        result3 = await self.client.execute("""
+                query {
+                    restaurants(orderBy: {field: "created_at", desk: true}) {
+                        id
+                    }
+                }""")
+        self.assertListEqual(result['data']['restaurants'], [{'id': '1'}, {'id': '2'}])
+        self.assertListEqual(result2['data']['restaurants'], [{'id': '2'}, {'id': '1'}])
+        self.assertListEqual(result2['data']['restaurants'], result3['data']['restaurants'])
 
     async def test_can_paginate_restaurants(self):
         image = await FileModel.create(path='t')
