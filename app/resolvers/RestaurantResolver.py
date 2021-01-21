@@ -2,9 +2,11 @@ from datetime import datetime
 from typing import List
 
 from graphene import ResolveInfo
+from tortoise import Tortoise
+
 from app.models import RestaurantModel, FileModel, DishModel, PlaceModel, TableModel
 from .OrderByPaginationResolver import OrderByPaginationResolver
-
+from tortoise.transactions import in_transaction
 
 class RestaurantResolver(OrderByPaginationResolver):
     @classmethod
@@ -71,3 +73,34 @@ class RestaurantResolver(OrderByPaginationResolver):
     async def resolve_restaurant_last_place_created_at(cls, parent: RestaurantModel, info: ResolveInfo) -> datetime:
         last_created_place: PlaceModel = await parent.places.order_by('created_at').first()
         return last_created_place.created_at
+
+    @classmethod
+    async def resolve_places_by_range(cls, info: ResolveInfo, latitude: float,
+                                longitude: float, distance: float) -> List[PlaceModel]:
+        distance *= 1.05
+        connection = Tortoise.get_connection('models')
+        raw_data: List[dict] = await connection.execute_query_dict("""
+            SELECT * FROM (
+                     SELECT id,
+                            created_at,
+                            updated_at,
+                            address,
+                            longitude,
+                            latitude,
+                            work_time_start,
+                            work_time_stop,
+                            preorder,
+                            rating,
+                            min_intervals_for_book,
+                            max_intervals_for_book,
+                            restaurant_id,
+                            (6371 * ACOS(SIN(RADIANS($1)) * SIN(RADIANS(latitude)) +
+                                         COS(RADIANS($1)) * COS(RADIANS(latitude)) *
+                                         (COS(RADIANS($2) - RADIANS(longitude))))) / 2 as distance
+                     FROM place
+                     ORDER BY distance
+                 ) subquery
+            WHERE distance < $3;
+        """, [latitude, longitude, distance])
+        places = [PlaceModel(**data) for data in raw_data]
+        return places
