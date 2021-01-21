@@ -1,0 +1,3 @@
+from .test_restaurant_query import RestaurantQueryTestCase
+from .test_places_by_range_query import PlacesByRangeQueryTestCase
+from .test_restaurants_query import RestaurantsQueryTestCase

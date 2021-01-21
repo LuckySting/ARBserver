@@ -1,0 +1,4 @@
+from .test_place_model import PlaceModelTestCase
+from .test_dish_model import DishModelTestCase
+from .test_restaurant_model import RestaurantModelTestCase
+from .test_table_model import TableModelTestCase
