@@ -89,14 +89,12 @@ class PlaceType(ObjectType):
         restaurant = await RestaurantResolver.resolve_place_restaurant(parent, info)
         return restaurant
 
-    async def resolve_tables(parent: PlaceModel, info: ResolveInfo, order_by: OrderByType = None,
-                             pagination: PaginationType = None) -> typing.List[TableModel]:
-        tables = await RestaurantResolver.resolve_place_tables(parent, info, order_by, pagination)
+    async def resolve_tables(parent: PlaceModel, info: ResolveInfo) -> typing.List[TableModel]:
+        tables = await RestaurantResolver.resolve_place_tables(parent, info)
         return tables
 
-    async def resolve_gallery(parent: PlaceModel, info: ResolveInfo, order_by: OrderByType = None,
-                              pagination: PaginationType = None) -> typing.List[FileModel]:
-        gallery = await RestaurantResolver.resolve_place_gallery(parent, info, order_by, pagination)
+    async def resolve_gallery(parent: PlaceModel, info: ResolveInfo) -> typing.List[FileModel]:
+        gallery = await RestaurantResolver.resolve_place_gallery(parent, info)
         return gallery
 
 

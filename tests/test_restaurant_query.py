@@ -1,7 +1,9 @@
+from datetime import datetime
+
 from tortoise.contrib.test import initializer, finalizer, IsolatedTestCase
 from graphene import Schema
 from graphene.test import Client
-from app.models import FileModel, DishModel, PlaceModel, TableModel
+from app.models import FileModel, DishModel, PlaceModel, TableModel, PlaceGalleryModel
 from app.schema import DefaultSchema
 from graphql.execution.executors.asyncio import AsyncioExecutor
 from app.models.RestaurantModel import RestaurantModel
@@ -141,3 +143,40 @@ class RestaurantQueryTestCase(IsolatedTestCase):
         places = result['data']['restaurant']['places']
         tables = places[0]['tables']
         self.assertEqual(tables[0], {'id': '1', 'name': 'sdf', 'capacity': 4, 'place': {'id': '1'}})
+
+    async def test_can_get_restaurant_place_gallery(self):
+        image = await FileModel.create(path='ttt')
+        rest = RestaurantModel(name='test2', image=image)
+        await rest.save()
+        place = await PlaceModel.create(address='dd', longitude=0, latitude=0, work_time='', restaurant=rest)
+        img1 = await FileModel.create(path='1')
+        img2 = await FileModel.create(path='2')
+        await PlaceGalleryModel.create(file=img1, place=place)
+        await PlaceGalleryModel.create(file=img2, place=place)
+        result = await self.client.execute(f"""
+            query {{
+                restaurant(id: "{rest.id}") {{
+                    id
+                    places {{
+                        gallery {{
+                            path
+                        }}
+                    }}
+                }}
+            }}""")
+        place = result['data']['restaurant']['places'][0]
+        gallery = place['gallery']
+        self.assertListEqual(gallery, [{'path': '1'}, {'path': '2'}])
+
+    async def test_can_get_restaurant_last_place_created_at(self):
+        image = await FileModel.create(path='ttt')
+        rest = RestaurantModel(name='test2', image=image)
+        await rest.save()
+        place = await PlaceModel.create(address='dd', longitude=0, latitude=0, work_time='', restaurant=rest)
+        result = await self.client.execute(f"""
+            query {{
+                restaurant(id: "{rest.id}") {{
+                    lastPlaceCreatedAt
+                }}
+            }}""")
+        self.assertEqual(datetime.fromisoformat(result['data']['restaurant']['lastPlaceCreatedAt']), place.created_at)

@@ -14,7 +14,7 @@ class PlaceModel(BaseModel):
     address = fields.CharField(max_length=300, description='Address of the place')
     longitude = fields.FloatField(description='Longitude of the place')
     latitude = fields.FloatField(description='Latitude of the place')
-    gallery: fields.ReverseRelation["PlaceGallery"]
+    gallery: fields.ReverseRelation["PlaceGalleryModel"]
     work_time_start = fields.CharField(default='', max_length=5, description='Place work time start')
     work_time_stop = fields.CharField(default='', max_length=5, description='Place work time start')
     preorder = fields.BooleanField(default=False, description='Preorder is allowed')
@@ -24,7 +24,12 @@ class PlaceModel(BaseModel):
     max_intervals_for_book = fields.IntField(description='Max number of intervals of 30 min for booking', default=10)
 
 
-class PlaceGallery(Model):
+class PlaceGalleryModel(Model):
+    class Meta:
+        table = 'placegallery'
+        table_description = 'Represents place gallery'
+
     place: fields.ForeignKeyRelation[PlaceModel] = fields.ForeignKeyField(model_name='models.PlaceModel',
                                                                           related_name='gallery')
-    file: fields.ForeignKeyRelation[FileModel] = fields.ForeignKeyField(model_name='models.FileModel')
+    file: fields.ForeignKeyRelation[FileModel] = fields.ForeignKeyField(model_name='models.FileModel',
+                                                                        related_name='places')

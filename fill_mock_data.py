@@ -1,5 +1,5 @@
 import asyncio
-from app.models import DishModel, FileModel, RestaurantModel, PlaceModel, PlaceGallery, TableModel
+from app.models import DishModel, FileModel, RestaurantModel, PlaceModel, PlaceGalleryModel, TableModel
 from app.settings import current_settings
 
 from tortoise import Tortoise
@@ -10,12 +10,14 @@ async def fill_mock_data():
     try:
         await db.init(config=current_settings.get_tortoise_orm_config())
         await asyncio.gather(RestaurantModel.all().delete(), DishModel.all().delete(), FileModel.all().delete(),
-                             PlaceModel.all().delete(), TableModel.all().delete())
+                             PlaceModel.all().delete(), TableModel.all().delete(), PlaceGalleryModel.all().delete())
         image = await FileModel.create(path='/static/rests/bob/asdf1f13.jpg')
         img2 = await FileModel.create(path='/static/rest/bob/dishes/sa1fsdf.png')
         img3 = await FileModel.create(path='/static/rest/bob/dishes/fkapsdkfpbn1fsdf.png')
         img4 = await FileModel.create(path='/static/rest/bob/dishes/bf1fsdf.bmp')
         img5 = await FileModel.create(path='/static/rest/bob/tables/b3233f.jpeg')
+        img6 = await FileModel.create(path='/static/rest/bob/gallery/assd.jpeg')
+        img7 = await FileModel.create(path='/static/rest/bob/gallery/ssss.jpeg')
         rest = await RestaurantModel.create(name='Закусочная у Боба', image=image,
                                             description='Лучшая закусочная рядом с тобой')
         await DishModel.create(name='Оливье', price=180, restaurant=rest, image=img2)
@@ -29,7 +31,8 @@ async def fill_mock_data():
                                         work_time='10:00 - 23:00',
                                         restaurant=rest
                                         )
-
+        await PlaceGalleryModel.create(place=place, file=img6)
+        await PlaceGalleryModel.create(place=place, file=img7)
         await TableModel.create(name='Столик у окна', capacity=6, place=place, image=img5)
     finally:
         await db.close_connections()

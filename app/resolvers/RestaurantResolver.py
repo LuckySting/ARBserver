@@ -1,8 +1,10 @@
+import asyncio
 from datetime import datetime
 from typing import List
 
 from graphene import ResolveInfo
 from tortoise import Tortoise
+from tortoise.query_utils import Prefetch
 
 from app.models import RestaurantModel, FileModel, DishModel, PlaceModel, TableModel
 from .OrderByPaginationResolver import OrderByPaginationResolver
@@ -58,16 +60,16 @@ class RestaurantResolver(OrderByPaginationResolver):
         return place
 
     @classmethod
-    async def resolve_place_tables(cls, parent: PlaceModel, info: ResolveInfo, order_by: 'OrderByType',
-                                   pagination: 'PaginationType') -> List[TableModel]:
-        tables = await cls.order_by_pagination(parent.tables.all(), order_by, pagination)
+    async def resolve_place_tables(cls, parent: PlaceModel, info: ResolveInfo) -> List[TableModel]:
+        tables = await parent.tables.all()
         return tables
 
     @classmethod
-    async def resolve_place_gallery(cls, parent: PlaceModel, info: ResolveInfo, order_by: 'OrderByType',
-                                    pagination: 'PaginationType') -> List[FileModel]:
-        gallery = await cls.order_by_pagination(parent.gallery.all(), order_by, pagination)
-        return gallery
+    async def resolve_place_gallery(cls, parent: PlaceModel, info: ResolveInfo) -> List[FileModel]:
+        gallery = await parent.gallery.all().prefetch_related(
+            Prefetch('file', FileModel.all())
+        )
+        return [gm.file for gm in gallery]
 
     @classmethod
     async def resolve_restaurant_last_place_created_at(cls, parent: RestaurantModel, info: ResolveInfo) -> datetime:
